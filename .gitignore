@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.env
+venv/
+env/
+
+# Uploads folder (PDFs - too large)
+uploads/
+
+# Database passwords (keep secure!)
+*.pem
+ca.pem
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini

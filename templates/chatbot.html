@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% block title %}Doubt Solver – EduGenie{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══════════════════════════════════
+   CHATBOT — Full Page Chat UI
+══════════════════════════════════ */
+.chat-page { max-width: 860px; margin: 0 auto; }
+
+/* Header */
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.chat-header-left { display: flex; align-items: center; gap: 1rem; }
+.chat-avatar-big {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, rgba(79,123,255,.3), rgba(0,212,255,.2));
+  border: 1px solid rgba(79,123,255,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+}
+.chat-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+.chat-subtitle { color: var(--text-muted); font-size: .82rem; margin-top: .15rem; }
+.chat-doc-pill {
+  background: rgba(79,123,255,.1);
+  border: 1px solid rgba(79,123,255,.2);
+  color: #8EB4FF;
+  padding: .3rem .9rem;
+  border-radius: 100px;
+  font-size: .78rem;
+  font-weight: 600;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Chat Window */
+.chat-window {
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px;
+  padding: 1.75rem;
+  min-height: 420px;
+  max-height: 500px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+/* Chat Messages */
+.chat-msg { display: flex; gap: .75rem; align-items: flex-end; }
+.chat-msg.bot  { flex-direction: row; }
+.chat-msg.user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.msg-avatar.bot-av {
+  background: linear-gradient(135deg, rgba(79,123,255,.25), rgba(0,212,255,.15));
+  border: 1px solid rgba(79,123,255,.25);
+}
+.msg-avatar.user-av {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.msg-bubble {
+  max-width: 75%;
+  padding: .9rem 1.2rem;
+  border-radius: 16px;
+  font-size: .9rem;
+  line-height: 1.7;
+}
+.chat-msg.bot .msg-bubble {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-bottom-left-radius: 4px;
+  color: #CBD5E1;
+}
+.chat-msg.user .msg-bubble {
+  background: linear-gradient(135deg, rgba(79,123,255,.25), rgba(79,123,255,.15));
+  border: 1px solid rgba(79,123,255,.3);
+  border-bottom-right-radius: 4px;
+  color: #E2E8F0;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: none;
+  align-items: flex-end;
+  gap: .75rem;
+}
+.typing-indicator.show { display: flex; }
+.typing-dots {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  padding: .9rem 1.2rem;
+  display: flex; gap: .35rem; align-items: center;
+}
+.typing-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #60A5FA;
+  animation: typingBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform: translateY(0); opacity: .5; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Input Section */
+.chat-input-wrapper {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  transition: border-color .2s;
+}
+.chat-input-wrapper:focus-within {
+  border-color: rgba(79,123,255,.4);
+}
+.chat-input-row {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #E2E8F0;
+  font-size: .95rem;
+  padding: .4rem 0;
+  font-family: inherit;
+}
+.chat-input::placeholder { color: rgba(255,255,255,.2); }
+.chat-send-btn {
+  background: linear-gradient(135deg, #4F7BFF, #2D5BE3);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: .6rem 1.3rem;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex; align-items: center; gap: .4rem;
+  white-space: nowrap;
+}
+.chat-send-btn:hover {
+  background: linear-gradient(135deg, #6B9FFF, #4F7BFF);
+  box-shadow: 0 4px 15px rgba(79,123,255,.4);
+}
+.chat-send-btn:disabled { opacity: .5; cursor: not-allowed; }
+.chat-hint {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: .5rem;
+}
+
+/* Suggested Questions */
+.suggestions-section { margin-top: 1rem; }
+.suggestions-label {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  margin-bottom: .6rem;
+}
+.suggestions-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.suggestion-btn {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text-muted);
+  padding: .42rem 1rem;
+  border-radius: 100px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.suggestion-btn:hover {
+  border-color: rgba(79,123,255,.35);
+  color: #8EB4FF;
+  background: rgba(79,123,255,.07);
+}
+
+/* Answer formatting */
+.msg-bubble strong { color: #F1F5F9; }
+.msg-bubble p { margin-bottom: .5rem; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-page">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar-big">🧞</div>
+      <div>
+        <div class="chat-title">💬 Doubt Solver</div>
+        <div class="chat-subtitle">AI answers from your textbook only</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span class="chat-doc-pill">📄 {{ doc.file_name }}</span>
+      <a href="{{ url_for('document_view', doc_id=doc_id) }}" class="btn btn-outline btn-sm">← Back</a>
+    </div>
+  </div>
+
+  <!-- Chat Window -->
+  <div class="chat-window" id="chatWindow">
+
+    <!-- Welcome Message -->
+    <div class="chat-msg bot">
+      <div class="msg-avatar bot-av">🧞</div>
+      <div class="msg-bubble">
+        Hi! I'm <strong>EduGenie</strong>. I can answer questions <strong>strictly based on your uploaded textbook</strong>. What would you like to know?
+      </div>
+    </div>
+
+    {% if question and answer %}
+    <!-- User Question -->
+    <div class="chat-msg user">
+      <div class="msg-bubble">{{ question }}</div>
+      <div class="msg-avatar user-av">👤</div>
+    </div>
+    <!-- Bot Answer -->
+    <div class="chat-msg bot">
+      <div class="msg-avatar bot-av">🧞</div>
+      <div class="msg-bubble" id="answerBubble">{{ answer }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Typing indicator (shown while waiting) -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="msg-avatar bot-av">🧞</div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Input Box -->
+  <div class="chat-input-wrapper">
+    <form action="{{ url_for('chatbot', doc_id=doc_id) }}" method="POST"
+          id="chatForm" onsubmit="showTyping()">
+      <div class="chat-input-row">
+        <input
+          type="text"
+          name="question"
+          id="questionInput"
+          class="chat-input"
+          placeholder="Ask a question about your textbook..."
+          autocomplete="off"
+          required
+          value="{{ question if question else '' }}"
+        />
+        <button type="submit" class="chat-send-btn" id="sendBtn">
+          Send →
+        </button>
+      </div>
+    </form>
+    <div class="chat-hint">💡 Answers are based strictly on your uploaded PDF content.</div>
+  </div>
+
+  <!-- Suggested Questions -->
+  <div class="suggestions-section">
+    <div class="suggestions-label">💡 Try asking</div>
+    <div class="suggestions-row">
+      <button class="suggestion-btn" onclick="fillQ('What are the main topics in this chapter?')">Main topics?</button>
+      <button class="suggestion-btn" onclick="fillQ('Explain the key concepts in simple terms.')">Key concepts?</button>
+      <button class="suggestion-btn" onclick="fillQ('What are the important definitions?')">Definitions?</button>
+      <button class="suggestion-btn" onclick="fillQ('Give me an example from the text.')">Give example?</button>
+      <button class="suggestion-btn" onclick="fillQ('What are the important formulas or rules?')">Formulas?</button>
+      <button class="suggestion-btn" onclick="fillQ('Summarize this topic in simple words.')">Summarize?</button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script>
+// Fill suggestion into input
+function fillQ(text) {
+  document.getElementById('questionInput').value = text;
+  document.getElementById('questionInput').focus();
+}
+
+// Show typing indicator on submit
+function showTyping() {
+  document.getElementById('typingIndicator').classList.add('show');
+  var btn = document.getElementById('sendBtn');
+  btn.textContent = '⏳';
+  btn.disabled = true;
+}
+
+// Render markdown in answer bubble
+window.addEventListener('DOMContentLoaded', function() {
+  var answerEl = document.getElementById('answerBubble');
+  if (answerEl && typeof marked !== 'undefined') {
+    var raw = answerEl.textContent || answerEl.innerText;
+    marked.setOptions({ breaks: true, gfm: true });
+    answerEl.innerHTML = marked.parse(raw);
+  }
+
+  // Scroll chat to bottom
+  var win = document.getElementById('chatWindow');
+  if (win) win.scrollTop = win.scrollHeight;
+});
+</script>
+{% endblock %}

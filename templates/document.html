@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ doc.file_name }} – EduGenie{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <h1>📄 {{ doc.file_name }}</h1>
+    <p class="page-subtitle">Uploaded on {{ doc.upload_timestamp.strftime('%d %b %Y') }}</p>
+  </div>
+</div>
+
+<!-- Action Cards -->
+<div class="action-grid">
+
+  <!-- Summarize -->
+  <div class="action-card action-summary">
+    <div class="action-icon">🤖</div>
+    <h3>AI Study Notes</h3>
+    <p>Generate concise, exam-ready study notes powered by Gemini AI.</p>
+    <form action="{{ url_for('summarize', doc_id=doc.doc_id) }}" method="POST">
+      <button type="submit" class="btn btn-primary btn-full" id="summaryBtn">
+        Generate Notes
+      </button>
+    </form>
+  </div>
+
+  <!-- Quiz -->
+  <div class="action-card action-quiz">
+    <div class="action-icon">🎯</div>
+    <h3>MCQ Quiz</h3>
+    <p>Auto-generate 5 multiple-choice questions and test your understanding.</p>
+    <form action="{{ url_for('generate_quiz', doc_id=doc.doc_id) }}" method="POST">
+      <button type="submit" class="btn btn-primary btn-full" id="quizBtn">
+        Start Quiz
+      </button>
+    </form>
+  </div>
+
+  <!-- Chatbot -->
+  <div class="action-card action-chat">
+    <div class="action-icon">💬</div>
+    <h3>Doubt Solver</h3>
+    <p>Ask any question — the chatbot answers only from your textbook content.</p>
+    <a href="{{ url_for('chatbot', doc_id=doc.doc_id) }}" class="btn btn-primary btn-full">
+      Open Chatbot
+    </a>
+  </div>
+
+</div>
+
+<!-- Text Preview -->
+<section class="section">
+  <h2 class="section-heading">Text Preview</h2>
+  <div class="text-preview-box">
+    <p>{{ doc.extracted_text[:1500] }}{% if doc.extracted_text|length > 1500 %}...</p>
+    <p class="text-muted">[ Preview truncated. Full text is stored in database. ]{% endif %}</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Show loading state on form submit
+  document.querySelectorAll('.action-card form').forEach(form => {
+    form.addEventListener('submit', function() {
+      const btn = this.querySelector('button');
+      btn.textContent = '⏳ Processing...';
+      btn.disabled = true;
+    });
+  });
+</script>
+{% endblock %}

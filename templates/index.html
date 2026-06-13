@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduGenie – AI Study Companion</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="landing-page">
+
+  <!-- Glow Orbs -->
+  <div class="orb orb-top"></div>
+  <div class="orb orb-bottom"></div>
+  <div class="orb orb-left"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar landing-nav">
+    <div class="nav-brand">
+      <span class="genie-icon">🧞</span>
+      <span class="brand-text">EduGenie</span>
+    </div>
+    <div class="nav-auth">
+      <a href="{{ url_for('login') }}"    class="btn btn-ghost">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🎓 AI-Powered Study Assistant</div>
+      <h1 class="hero-title">
+        Study Smarter with<br>
+        <span class="gradient-text">EduGenie</span>
+      </h1>
+      <p class="hero-subtitle">
+        Upload any textbook PDF and instantly get AI-generated study notes,
+        MCQ quizzes, and a context-aware doubt-solving chatbot.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Start for Free →</a>
+        <a href="{{ url_for('login') }}"    class="btn btn-outline btn-lg">Login</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="floating-card card-1"><span>📄</span><p>Upload PDF</p></div>
+      <div class="hero-genie">🧞</div>
+      <div class="floating-card card-2"><span>📝</span><p>AI Notes</p></div>
+      <div class="floating-card card-3"><span>🎯</span><p>MCQ Quiz</p></div>
+      <div class="floating-card card-4"><span>💬</span><p>Chatbot</p></div>
+    </div>
+  </section>
+
+  <!-- Glow Divider -->
+  <div class="glow-divider"></div>
+
+  <!-- 6 Features Section -->
+  <section class="features-section" id="features">
+    <div class="section-label">✦ Features</div>
+    <h2 class="section-title">Everything You Need to<br>Ace Your Exams</h2>
+    <p style="text-align:center;color:var(--text-muted);font-size:.95rem;margin-bottom:3rem;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7">
+      Streamline your study workflow with our AI-powered tools designed for college students.
+    </p>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">📤</div>
+        <h3>Smart PDF Upload</h3>
+        <p>Upload any textbook or lecture notes up to 200MB. Our system extracts all text automatically using PyPDF2.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Summarization</h3>
+        <p>Gemini AI transforms dense chapters into concise, exam-ready study notes in seconds.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>MCQ Quiz Generator</h3>
+        <p>Auto-generate multiple-choice questions from any chapter and test your knowledge instantly.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Doubt-Solving Chatbot</h3>
+        <p>Ask questions and get answers strictly from your textbook — no hallucinations, only facts.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Performance Analytics</h3>
+        <p>Track your quiz scores over time and see exactly where you need to improve.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">☁️</div>
+        <h3>Cloud Database</h3>
+        <p>All your documents and scores are saved securely in MySQL — access anytime, anywhere.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Glow Divider -->
+  <div class="glow-divider"></div>
+
+  <!-- CTA Section -->
+  <section style="max-width:700px;margin:0 auto;padding:2rem 2rem 8rem;text-align:center;position:relative;z-index:1">
+    <div class="section-label">✦ Get Started Today</div>
+    <h2 class="section-title">Ready to Study Smarter?</h2>
+    <p style="color:var(--text-muted);margin:1rem 0 2.5rem;font-size:1rem;line-height:1.75">
+      Join EduGenie and transform the way you learn.<br>Upload your first PDF completely free.
+    </p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create Free Account →</a>
+      <a href="{{ url_for('login') }}"    class="btn btn-outline btn-lg">Login</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>🧞 EduGenie &mdash; AI Study Companion &copy; 2025 &nbsp;|&nbsp; Yashwantrao Bhonsale Institute of Technology</p>
+  </footer>
+
+</body>
+</html>

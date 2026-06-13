@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}Quiz Results – EduGenie{% endblock %}
+
+{% block extra_css %}
+<style>
+.results-wrapper { max-width: 780px; margin: 0 auto; }
+
+/* Score Hero */
+.score-hero {
+  text-align: center;
+  padding: 3rem 1rem 2.5rem;
+}
+.score-circle {
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+  border: 4px solid;
+  position: relative;
+}
+.score-circle.excellent { border-color: #10B981; background: rgba(16,185,129,.08); }
+.score-circle.good      { border-color: #F59E0B; background: rgba(245,158,11,.08); }
+.score-circle.average   { border-color: #4F7BFF; background: rgba(79,123,255,.08); }
+.score-circle.poor      { border-color: #EF4444; background: rgba(239,68,68,.08); }
+.score-number { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+.score-label  { font-size: .72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; margin-top: .2rem; }
+.score-title  { font-size: 1.6rem; font-weight: 800; margin-bottom: .4rem; letter-spacing: -.02em; }
+.score-subtitle { color: var(--text-muted); font-size: .95rem; }
+
+/* Stats Row */
+.score-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  display: flex; align-items: center; gap: .5rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 100px;
+  padding: .5rem 1.25rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+/* Review Section */
+.review-section { margin-top: 2rem; }
+.review-heading {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.review-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Question Result Card — Google Forms Style */
+.result-card {
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+}
+.result-card.correct {
+  background: rgba(16,185,129,.05);
+  border-color: rgba(16,185,129,.2);
+}
+.result-card.correct::before { background: #10B981; }
+.result-card.wrong {
+  background: rgba(239,68,68,.05);
+  border-color: rgba(239,68,68,.2);
+}
+.result-card.wrong::before { background: #EF4444; }
+.result-card.skipped {
+  background: rgba(245,158,11,.04);
+  border-color: rgba(245,158,11,.15);
+}
+.result-card.skipped::before { background: #F59E0B; }
+
+.result-card-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.result-question-num { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); }
+.result-badge {
+  font-size: .75rem; font-weight: 700;
+  padding: .25rem .75rem;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+.result-badge.correct { background: rgba(16,185,129,.15); color: #34D399; }
+.result-badge.wrong   { background: rgba(239,68,68,.15);  color: #F87171; }
+.result-badge.skipped { background: rgba(245,158,11,.12); color: #FCD34D; }
+
+.result-question-text {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Answer options in result */
+.result-options { display: flex; flex-direction: column; gap: .5rem; }
+
+.result-option {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .65rem 1rem;
+  border-radius: 9px;
+  font-size: .88rem;
+  border: 1.5px solid transparent;
+}
+
+/* Correct answer — always green */
+.result-option.is-correct {
+  background: rgba(16,185,129,.1);
+  border-color: rgba(16,185,129,.35);
+  color: #6EE7B7;
+}
+
+/* What user selected (when wrong) — red */
+.result-option.user-wrong {
+  background: rgba(239,68,68,.08);
+  border-color: rgba(239,68,68,.3);
+  color: #FCA5A5;
+}
+
+/* Unselected options — dim */
+.result-option.neutral {
+  background: rgba(255,255,255,.02);
+  color: var(--text-muted);
+}
+
+.result-option-letter {
+  font-size: .78rem;
+  font-weight: 700;
+  min-width: 22px;
+}
+.result-option-icon { margin-left: auto; font-size: .9rem; }
+
+/* Correct answer label (shown below wrong answer) */
+.correct-answer-note {
+  margin-top: .85rem;
+  padding: .65rem 1rem;
+  background: rgba(16,185,129,.08);
+  border: 1px solid rgba(16,185,129,.2);
+  border-radius: 9px;
+  font-size: .85rem;
+  color: #6EE7B7;
+  display: flex; align-items: center; gap: .5rem;
+}
+
+/* Actions */
+.results-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  justify-content: center;
+  padding: 2rem 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="results-wrapper">
+
+  <!-- Score Hero -->
+  <div class="score-hero">
+    {% set pct = (score / total * 100)|int %}
+    <div class="score-circle {% if pct >= 80 %}excellent{% elif pct >= 60 %}good{% elif pct >= 40 %}average{% else %}poor{% endif %}">
+      <span class="score-number">{{ pct }}%</span>
+      <span class="score-label">Score</span>
+    </div>
+
+    <h1 class="score-title">
+      {% if pct >= 80 %}🌟 Excellent Work!
+      {% elif pct >= 60 %}👍 Good Job!
+      {% elif pct >= 40 %}📚 Keep Studying!
+      {% else %}💪 Don't Give Up!
+      {% endif %}
+    </h1>
+    <p class="score-subtitle">You scored <strong>{{ score }}</strong> out of <strong>{{ total }}</strong> questions</p>
+
+    <!-- Stats Pills -->
+    <div class="score-stats">
+      <div class="stat-pill" style="color:#34D399">✅ Correct: {{ score }}</div>
+      <div class="stat-pill" style="color:#F87171">❌ Wrong: {{ total - score }}</div>
+      <div class="stat-pill" style="color:#60A5FA">📊 Total: {{ total }}</div>
+    </div>
+  </div>
+
+  <!-- Answer Review — Google Forms Style -->
+  <div class="review-section">
+    <div class="review-heading">📋 Answer Review</div>
+
+    {% for r in results %}
+    {% set q_num = r.index|int + 1 %}
+
+    <div class="result-card {% if r.is_correct %}correct{% elif r.chosen %}wrong{% else %}skipped{% endif %}">
+      <div class="result-card-header">
+        <span class="result-question-num">Question {{ q_num }}</span>
+        {% if r.is_correct %}
+          <span class="result-badge correct">✅ Correct</span>
+        {% elif r.chosen %}
+          <span class="result-badge wrong">❌ Incorrect</span>
+        {% else %}
+          <span class="result-badge skipped">⏭️ Skipped</span>
+        {% endif %}
+      </div>
+
+      <!-- All Options displayed like Google Forms -->
+      <div class="result-options">
+        {% for key in ['A', 'B', 'C', 'D'] %}
+          {% if key == r.correct and r.is_correct %}
+            <!-- User selected AND it's correct → green -->
+            <div class="result-option is-correct">
+              <span class="result-option-letter">{{ key }}</span>
+              <span>Selected &amp; Correct Answer</span>
+              <span class="result-option-icon">✅</span>
+            </div>
+          {% elif key == r.correct and not r.is_correct %}
+            <!-- Correct answer but user didn't select it → green outline -->
+            <div class="result-option is-correct">
+              <span class="result-option-letter">{{ key }}</span>
+              <span>Correct Answer</span>
+              <span class="result-option-icon">✅</span>
+            </div>
+          {% elif key == r.chosen and not r.is_correct %}
+            <!-- User's wrong selection → red -->
+            <div class="result-option user-wrong">
+              <span class="result-option-letter">{{ key }}</span>
+              <span>Your Answer (Wrong)</span>
+              <span class="result-option-icon">❌</span>
+            </div>
+          {% else %}
+            <!-- Other options → neutral -->
+            <div class="result-option neutral">
+              <span class="result-option-letter">{{ key }}</span>
+              <span>Option {{ key }}</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Extra note for wrong answers -->
+      {% if not r.is_correct and r.chosen %}
+      <div class="correct-answer-note">
+        💡 The correct answer was: <strong>Option {{ r.correct }}</strong>
+      </div>
+      {% elif not r.is_correct and not r.chosen %}
+      <div class="correct-answer-note">
+        💡 You skipped this. The correct answer was: <strong>Option {{ r.correct }}</strong>
+      </div>
+      {% endif %}
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Actions -->
+  <div class="results-actions">
+    <a href="{{ url_for('document_view', doc_id=doc_id) }}" class="btn btn-outline">← Back to Document</a>
+    <form action="{{ url_for('generate_quiz', doc_id=doc_id) }}" method="POST" style="display:inline">
+      <button type="submit" class="btn btn-primary">🔄 Retake Quiz</button>
+    </form>
+    <a href="{{ url_for('analytics') }}" class="btn btn-outline">📊 View Analytics</a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% block title %}Quiz – EduGenie{% endblock %}
+
+{% block extra_css %}
+<style>
+.quiz-wrapper { max-width: 780px; margin: 0 auto; }
+
+.question-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.question-number {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  margin-bottom: .6rem;
+}
+
+.question-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #E8EDF5;
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+}
+
+.options-list { display: flex; flex-direction: column; gap: .6rem; }
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  background: rgba(255,255,255,.02);
+  border: 1.5px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  padding: .85rem 1.1rem;
+  cursor: pointer;
+  transition: all .2s;
+  user-select: none;
+}
+.option-item:hover {
+  border-color: rgba(79,123,255,.3);
+  background: rgba(79,123,255,.05);
+}
+.option-item.selected {
+  border-color: rgba(79,123,255,.6);
+  background: rgba(79,123,255,.12);
+}
+
+.option-item input[type="radio"] { display: none; }
+
+.radio-circle {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.25);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.option-item.selected .radio-circle {
+  border-color: #4F7BFF;
+  background: #4F7BFF;
+}
+.radio-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.option-item.selected .radio-dot { opacity: 1; }
+
+.option-letter {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 18px;
+}
+.option-item.selected .option-letter { color: #93C5FD; }
+.option-text-val { font-size: .92rem; color: #CBD5E1; line-height: 1.4; }
+
+.quiz-progress-bar {
+  background: rgba(255,255,255,.06);
+  border-radius: 100px;
+  height: 6px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4F7BFF, #00D4FF);
+  border-radius: 100px;
+  transition: width .4s ease;
+  width: 0%;
+}
+
+.quiz-submit-bar {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.quiz-answered-count { font-size: .9rem; color: var(--text-muted); }
+.quiz-answered-count strong { color: #60A5FA; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quiz-wrapper">
+  <div class="page-header">
+    <div>
+      <a href="{{ url_for('document_view', doc_id=doc_id) }}" class="back-link">← Back to Document</a>
+      <h1>🎯 MCQ Quiz</h1>
+      <p class="page-subtitle">{{ filename }}</p>
+    </div>
+    <div class="quiz-meta">
+      <span class="badge">{{ questions|length }} Questions</span>
+      <span class="timer-display" id="timerDisplay">⏱️ 00:00</span>
+    </div>
+  </div>
+
+  {% if questions %}
+
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="progressFill"></div>
+  </div>
+
+  <form action="{{ url_for('submit_quiz') }}" method="POST" id="quizForm">
+    <input type="hidden" name="doc_id" value="{{ doc_id }}" />
+    <input type="hidden" name="total_questions" value="{{ questions|length }}" />
+
+    {% for q in questions %}
+    {% set qi = loop.index0 %}
+    <input type="hidden" name="correct_{{ qi }}" value="{{ q.answer }}" />
+
+    <div class="question-card">
+      <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
+      <div class="question-text">{{ q.question }}</div>
+
+      <div class="options-list">
+        {% if q.options.A is defined %}
+        <label class="option-item" id="lbl-{{ qi }}-A" onclick="selectOption({{ qi }}, 'A')">
+          <input type="radio" name="answer_{{ qi }}" value="A" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <span class="option-letter">A</span>
+          <span class="option-text-val">{{ q.options.A }}</span>
+        </label>
+        {% endif %}
+        {% if q.options.B is defined %}
+        <label class="option-item" id="lbl-{{ qi }}-B" onclick="selectOption({{ qi }}, 'B')">
+          <input type="radio" name="answer_{{ qi }}" value="B" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <span class="option-letter">B</span>
+          <span class="option-text-val">{{ q.options.B }}</span>
+        </label>
+        {% endif %}
+        {% if q.options.C is defined %}
+        <label class="option-item" id="lbl-{{ qi }}-C" onclick="selectOption({{ qi }}, 'C')">
+          <input type="radio" name="answer_{{ qi }}" value="C" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <span class="option-letter">C</span>
+          <span class="option-text-val">{{ q.options.C }}</span>
+        </label>
+        {% endif %}
+        {% if q.options.D is defined %}
+        <label class="option-item" id="lbl-{{ qi }}-D" onclick="selectOption({{ qi }}, 'D')">
+          <input type="radio" name="answer_{{ qi }}" value="D" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <span class="option-letter">D</span>
+          <span class="option-text-val">{{ q.options.D }}</span>
+        </label>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="quiz-submit-bar">
+      <div class="quiz-answered-count">
+        <strong id="answeredCount">0</strong> of {{ questions|length }} answered
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+        Submit Quiz →
+      </button>
+    </div>
+  </form>
+
+  {% else %}
+  <div class="empty-state">
+    <span>⚠️</span>
+    <p>Could not generate questions. Please try again.</p>
+    <a href="{{ url_for('document_view', doc_id=doc_id) }}" class="btn btn-primary">← Back</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var answered   = 0;
+var total      = {{ questions|length }};
+var selections = {};
+
+function selectOption(qIdx, key) {
+  // Deselect all 4 options for this question only
+  ['A','B','C','D'].forEach(function(k) {
+    var lbl = document.getElementById('lbl-' + qIdx + '-' + k);
+    if (lbl) lbl.classList.remove('selected');
+  });
+
+  // Select the clicked one
+  var chosen = document.getElementById('lbl-' + qIdx + '-' + key);
+  if (chosen) chosen.classList.add('selected');
+
+  // Check the radio
+  var radio = chosen ? chosen.querySelector('input[type="radio"]') : null;
+  if (radio) radio.checked = true;
+
+  // Count answered
+  if (!selections[qIdx]) {
+    answered++;
+    document.getElementById('answeredCount').textContent = answered;
+    var pct = Math.round(answered / total * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+  selections[qIdx] = key;
+}
+
+// Timer
+var secs = 0;
+var timer = setInterval(function() {
+  secs++;
+  var m = String(Math.floor(secs/60)).padStart(2,'0');
+  var s = String(secs%60).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = '⏱️ ' + m + ':' + s;
+}, 1000);
+
+// Submit confirmation
+document.getElementById('quizForm').addEventListener('submit', function(e) {
+  if (answered < total) {
+    if (!confirm('You answered ' + answered + ' of ' + total + '. Submit anyway?')) {
+      e.preventDefault();
+      return;
+    }
+  }
+  clearInterval(timer);
+  var btn = document.getElementById('submitBtn');
+  btn.textContent = '⏳ Submitting...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}
