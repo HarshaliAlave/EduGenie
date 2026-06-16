@@ -20,7 +20,7 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200 MB
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # ─── Gemini API Configuration ────────────────────────────────────────────────
-GEMINI_API_KEY = "AIzaSyDcb25h4AD7LRHkcTnlF_N3ap00g2ETMsc"  # ← Paste your NEW API key here
+GEMINI_API_KEY = "YOUR_API_KEY_HERE"  # ← Paste your NEW API key here
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ─── Database Connection ─────────────────────────────────────────────────────
