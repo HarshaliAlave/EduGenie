@@ -1,3 +1,11 @@
+# Copyright 2026 Harshali Alave
+# EduGenie - AI Study Companion
+#
+# Licensed under the Apache License, Version 2.0
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Original web application hosted on PythonAnywhere
+# Unauthorized copying or redistribution is prohibited.
 import os
 import re
 from flask import Flask, render_template, request, redirect, url_for, session, flash
