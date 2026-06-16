@@ -2,7 +2,7 @@ EduGenie - AI Study Companion
 Copyright 2026 Harshali Alave
 
 Original Author: Harshali Alave
-Web Application hosted at: https://[yourapp].pythonanywhere.com
+Web Application hosted at: https://edugenieai.pythonanywhere.com
 Original project created and hosted before June 2026.
 
 Licensed under the Apache License, Version 2.0
