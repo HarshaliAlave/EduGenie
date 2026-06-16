@@ -274,7 +274,7 @@ See the full [LICENSE](./LICENSE) file for details.
 
 🌐 [edugenieai.pythonanywhere.com](https://edugenieai.pythonanywhere.com)  
 🔗 [GitHub — HarshaliAlave](https://github.com/HarshaliAlave)  
-📧 your-email@example.com
+📧 harshaliaalve@gmail.com
 
 ---
 
